@@ -132,6 +132,9 @@
         <label for="limit">何人:</label>
         <input type="text" value="3" id="limit">
         <button type="button" id="submit">取得</button>
+        <br>
+        <label for="nyax-url">NyaXのURL</label>
+        <input type="text" value="" id="nyax-url">
         <div id="user_list"></div>
         <span id="error"></span>
         <script>
@@ -144,6 +147,7 @@
                 const submit_button = document.querySelector('button#submit');
                 const user_list_div = document.querySelector('div#user_list');
                 const error_span = document.querySelector('span#error');
+                const nyax_url = document.querySelector('input#nyax-url');
                 function getUserIconUrl(user) {
                     if (!user) return 'logo.png';
                     
@@ -196,7 +200,7 @@
                     recHTML += data.map(user => {
                         return `
                         <div class="widget-item recommend-user">
-                        <a href="#profile/${user.id}" class="profile-link" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem;">
+                        <a href="${nyax_url.value}#profile/${user.id}" class="profile-link" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem;" target="_blank" rel="noopener noreferrer">
                         <img src="${getUserIconUrl(user)}" style="width:40px;height:40px;border-radius:50%;" alt="${user.name}'s icon">
                         <div>
                         <span>${getEmoji(escapeHTML(user.name))}</span>
