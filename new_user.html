@@ -183,6 +183,7 @@
                     if(isNaN(limit_num)) return;
                     let query = supabase.from('user').select('id, name, scid, icon_data, time');
                     const { data, error } = await query.order('time', { ascending: false }).limit(limit_num);
+                    alert(data);
                     let recHTML = '<div class="widget-title">おすすめユーザー</div>';
                     if (error || !data || data.length === 0) {
                         if(user_list_div) user_list_div.innerHTML = '';
