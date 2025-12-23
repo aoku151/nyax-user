@@ -7,7 +7,8 @@
     </head>
     <body>
         <input type="text" value="3" id="limit">
-        <button type="button" id="submit">
+        <button type="button" id="submit">取得</button>
+        <div id="user_list"></div>
         <script>
             window.addEventListener('DOMCOntentLoaded', async () => {
                 const SUPABASE_URL = 'https://mnvdpvsivqqbzbtjtpws.supabase.co';
@@ -16,9 +17,21 @@
                 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 const limit_input = document.querySelector('input#limit');
                 const submit_button = document.querySelector('button#submit');
+                const user_list_div = document.querySelector('div#user_list');
                 submit_button.addEventListener('click', async () => {
+                    const limit_num = Number(limit_input.value);
+                    if(isNaN(limit_num)) return;
                     let query = supabase.from('user').select('id, name, scid, icon_data');
-                    const { data, error } = await query.order('time', { ascending: false }).limit(limit_input.value);
+                    const { data, error } = await query.order('time', { ascending: false }).limit(limit_num);
+                    let recHTML = '<div class="widget-title">おすすめユーザー</div>';
+                    if (error || !data || data.length === 0) {
+                        if(user_list_div) user_list_div.innerHTML = '';
+                        return;
+                    }
+                    recHTML += data.map(user => {
+                        return ` <div class="widget-item recommend-user"> <a href="#profile/${user.id}" class="profile-link" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem;"> <img src="${getUserIconUrl(user)}" style="width:40px;height:40px;border-radius:50%;" alt="${user.name}'s icon"> <div> <span>${getEmoji(escapeHTML(user.name))}</span> <small style="color:var(--secondary-text-color); display:block;">#${user.id}</small> </div> </a> ${currentUser && currentUser.id !== user.id ? `<button class="${btnClass}" data-user-id="${user.id}">${btnText}</button>` : ''} </div>`;
+                    }).join('');
+                    
                 })
             });
         </script>
