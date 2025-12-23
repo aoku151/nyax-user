@@ -179,7 +179,18 @@
                     const min = jst.getMinutes();
                     const dates = `${year}年${month}月${day}日${hours}時${min}分よりNyaXを利用しています`;
                     recHTML += data.map(user => {
-                        return ` <div class="widget-item recommend-user"> <a href="#profile/${user.id}" class="profile-link" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem;"> <img src="${getUserIconUrl(user)}" style="width:40px;height:40px;border-radius:50%;" alt="${user.name}'s icon"> <div> <span>${getEmoji(escapeHTML(user.name))}</span> <small style="color:var(--secondary-text-color); display:block;">#${user.id}</small> ${calender_icon} <span class="profile-joined-text"></span> </div> </a> </div>`;
+                        return `
+                        <div class="widget-item recommend-user">
+                        <a href="#profile/${user.id}" class="profile-link" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem;">
+                        <img src="${getUserIconUrl(user)}" style="width:40px;height:40px;border-radius:50%;" alt="${user.name}'s icon">
+                        <div>
+                        <span>${getEmoji(escapeHTML(user.name))}</span>
+                        <small style="color:var(--secondary-text-color); display:block;">#${user.id}</small>
+                        ${calender_icon}
+                        <span class="profile-joined-text">${dates}</span>
+                        </div>
+                        </a>
+                        </div>`;
                     }).join('');
                     user_list_div.innerHTML = recHTML;
                 });
