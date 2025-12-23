@@ -157,11 +157,12 @@
                 function getEmoji(str) {
                     return emojione.toImage(str);
                 }
+                const calender_icon = `<svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
                 submit_button.addEventListener('click', async () => {
                     error_span.textContent = '';
                     const limit_num = Number(limit_input.value);
                     if(isNaN(limit_num)) return;
-                    let query = supabase.from('user').select('id, name, scid, icon_data');
+                    let query = supabase.from('user').select('id, name, scid, icon_data, time');
                     const { data, error } = await query.order('time', { ascending: false }).limit(limit_num);
                     let recHTML = '<div class="widget-title">おすすめユーザー</div>';
                     if (error || !data || data.length === 0) {
@@ -169,8 +170,16 @@
                         error_span.textContent = error;
                         return;
                     }
+                    const d = new Date(data.time);
+                    const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+                    const year = jst.getFullYear();
+                    const month = jst.getMonth();
+                    const day = jst.getDate();
+                    const hours = jst.getHours();
+                    const min = jst.getMinutes();
+                    const dates = `${year}年${month}月${day}日${hours}時${min}分よりNyaXを利用しています`;
                     recHTML += data.map(user => {
-                        return ` <div class="widget-item recommend-user"> <a href="#profile/${user.id}" class="profile-link" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem;"> <img src="${getUserIconUrl(user)}" style="width:40px;height:40px;border-radius:50%;" alt="${user.name}'s icon"> <div> <span>${getEmoji(escapeHTML(user.name))}</span> <small style="color:var(--secondary-text-color); display:block;">#${user.id}</small> </div> </a> </div>`;
+                        return ` <div class="widget-item recommend-user"> <a href="#profile/${user.id}" class="profile-link" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem;"> <img src="${getUserIconUrl(user)}" style="width:40px;height:40px;border-radius:50%;" alt="${user.name}'s icon"> <div> <span>${getEmoji(escapeHTML(user.name))}</span> <small style="color:var(--secondary-text-color); display:block;">#${user.id}</small> ${calender_icon} <span class="profile-joined-text"></span> </div> </a> </div>`;
                     }).join('');
                     user_list_div.innerHTML = recHTML;
                 });
