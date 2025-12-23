@@ -4,11 +4,104 @@
         <meta charset="utf-8">
         <title>NyaX New User</title>
         <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/emojione@4.0.0/lib/js/emojione.min.js"></script>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+            :root {
+                /* 共通色設定 */
+                --primary-color: #1d9bf0;
+                --primary-hover-color: #1a8cd8;
+                --like-color: #f91880;
+                --star-color: #ffad1f;
+                /* ライトモード(デフォルト)色設定 */
+                --border-color: #eff3f4;
+                --bg-color: #f9f9f9;
+                --main-bg-color: white;
+                --ad-bg-color: #f7f9f9;
+                --pg-bg-color: rgba(255, 255, 255, 0.85); /* ページヘッダーなど */
+                --emoji-bg-color: none;
+                --notification-bg-color: #e8f5fd;
+                --text-color: #0f1419;
+                --secondary-text-color: #536471;
+                --logo-color: black; /* ロゴ表示用に使っているが背景色と真逆の色を使う時に指定されることもある */
+                --loading-color: rgba(255, 255, 255, 0.7);
+                --widget-bg-color: #e7e8e8; /* プロフィールカードホバー時 */
+                --emoji-mart: 255, 255, 255;
+                --bw: #000000;
+                --spin: rgba(0, 0, 0, 0.1);
+                --light-primary-color: #cce6ff;
+                --danger-color: #fef0f4;
+            }
+            
+            body {
+                font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                margin: 0;
+                background-color: var(--main-bg-color);
+                color: var(--text-color);
+            }
+            
+            /* 入力欄のフォントをNoto Sans JPに統一 */
+            input, textarea {
+                font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            }
+            .sidebar-widget {
+                background-color: var(--bg-color);
+                border-radius: 16px;
+                margin-bottom: 1rem;
+                overflow: hidden;
+            }
+            
+            .widget-title {
+                font-size: 1.25rem;
+                font-weight: 800;
+                padding: 0.75rem 1rem;
+            }
+            
+            /* ▼▼▼ このブロックを修正 ▼▼▼ */
+            .widget-item {
+                padding: 0.75rem 1rem;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+            
+            .widget-item:hover {
+                background-color: var(--widget-bg-color);
+            }
+            
+            .recommend-user {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 0.8rem; /* 要素間の隙間を追加 */
+            }
+            
+            /* ▼▼▼ このブロックを新規追加 ▼▼▼ */
+            /* ユーザー情報を含むリンク（aタグ）の挙動を定義 */
+            .recommend-user > a {
+                min-width: 0; /* flexアイテムが自身のコンテンツ幅以下に縮むことを許可 */
+                flex-shrink: 1; /* 親コンテナが狭いときに縮むことを許可 */
+                overflow: hidden; /* はみ出し防止のため */
+            }
+            
+            /* ユーザー名とIDを囲むdiv */
+            .recommend-user > a > div {
+                overflow: hidden; /* 中のspanがはみ出た場合に隠すため */
+            }
+            
+            /* フォローボタンは縮まないようにする */
+            .recommend-user > button {
+                flex-shrink: 0;
+            }
+            /* ▲▲▲ 追加ここまで ▲▲▲ */
+
+        </style>
     </head>
     <body>
         <input type="text" value="3" id="limit">
         <button type="button" id="submit">取得</button>
         <div id="user_list"></div>
+        <span id="error"></span>
         <script>
             window.addEventListener('DOMCOntentLoaded', async () => {
                 const SUPABASE_URL = 'https://mnvdpvsivqqbzbtjtpws.supabase.co';
@@ -18,7 +111,37 @@
                 const limit_input = document.querySelector('input#limit');
                 const submit_button = document.querySelector('button#submit');
                 const user_list_div = document.querySelector('div#user_list');
+                const error_span = document.querySelector('span#error');
+                function getUserIconUrl(user) {
+                    if (!user) return 'logo.png';
+                    
+                    // icon_dataが存在するかチェック
+                    if (user.icon_data) {
+                        // Data URL形式か、それともファイルID(UUID)かを判別
+                        if (user.icon_data.startsWith('data:image')) {
+                            // 古い形式（Data URL）の場合はそのまま返す
+                            return user.icon_data;
+                        } else {
+                            // 新しい形式（ファイルID）の場合は、Supabase Storageの公開URLを生成して返す
+                            const { data } = supabase.storage.from('nyax').getPublicUrl(user.icon_data);
+                            return data.publicUrl;
+                        }
+                    }
+                    
+                    // icon_dataがなければ、デフォルトのScratchアバターURLを返す
+                    return `https://mnvdpvsivqqbzbtjtpws.supabase.co/functions/v1/getScratchUserIcon?id=${user.scid}`;
+                }
+                function escapeHTML(str) {
+                    if (typeof str !== 'string') return '';
+                    const div = document.createElement('div');
+                    div.textContent = str;
+                    return div.innerHTML;
+                }
+                function getEmoji(str) {
+                    return emojione.toImage(str);
+                }
                 submit_button.addEventListener('click', async () => {
+                    error_span.textContent = '';
                     const limit_num = Number(limit_input.value);
                     if(isNaN(limit_num)) return;
                     let query = supabase.from('user').select('id, name, scid, icon_data');
@@ -26,13 +149,14 @@
                     let recHTML = '<div class="widget-title">おすすめユーザー</div>';
                     if (error || !data || data.length === 0) {
                         if(user_list_div) user_list_div.innerHTML = '';
+                        error_span.textContent = error;
                         return;
                     }
                     recHTML += data.map(user => {
-                        return ` <div class="widget-item recommend-user"> <a href="#profile/${user.id}" class="profile-link" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem;"> <img src="${getUserIconUrl(user)}" style="width:40px;height:40px;border-radius:50%;" alt="${user.name}'s icon"> <div> <span>${getEmoji(escapeHTML(user.name))}</span> <small style="color:var(--secondary-text-color); display:block;">#${user.id}</small> </div> </a> ${currentUser && currentUser.id !== user.id ? `<button class="${btnClass}" data-user-id="${user.id}">${btnText}</button>` : ''} </div>`;
+                        return ` <div class="widget-item recommend-user"> <a href="#profile/${user.id}" class="profile-link" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem;"> <img src="${getUserIconUrl(user)}" style="width:40px;height:40px;border-radius:50%;" alt="${user.name}'s icon"> <div> <span>${getEmoji(escapeHTML(user.name))}</span> <small style="color:var(--secondary-text-color); display:block;">#${user.id}</small> </div> </a> </div>`;
                     }).join('');
-                    
-                })
+                    user_list_div.innerHTML = recHTML;
+                });
             });
         </script>
     </body>
