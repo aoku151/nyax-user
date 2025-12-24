@@ -109,7 +109,7 @@
             }
             /* ▲▲▲ 追加ここまで ▲▲▲ */
             /* プロフィール画面の参加日のスタイル */
-            .profile-joined-text {
+            .profile-joined {
                 display: flex;
                 align-items: center;
                 gap: 0.5rem;
@@ -198,6 +198,7 @@
                         <div>
                         <span>${getEmoji(escapeHTML(user.name))}</span>
                         <small style="color:var(--secondary-text-color); display:block;">#${user.id}</small>
+                        <div class="profile-joined">
                         ${calender_icon}
                         <span class="profile-joined-text">
                         ${escapeHTML(((_user)=>{
@@ -213,6 +214,7 @@
                             return dates;
                         })(user))}
                         </span>
+                        </div>
                         </div>
                         </a>
                         </div>`;
