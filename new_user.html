@@ -208,7 +208,19 @@
                         <span>${getEmoji(escapeHTML(user.name))}</span>
                         <small style="color:var(--secondary-text-color); display:block;">#${user.id}</small>
                         ${calender_icon}
-                        <span class="profile-joined-text">${dates}</span>
+                        <span class="profile-joined-text">
+                        ${escapeHTML(((_user)=>{
+                            const d = new Date(_user.time);
+                            alert(JSON.stringify(d));
+                            const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+                            const year = jst.getFullYear();
+                            const month = jst.getMonth();
+                            const day = jst.getDate();
+                            const hours = jst.getHours();
+                            const min = jst.getMinutes();
+                            const dates = `${year}年${month}月${day}日${hours}時${min}分よりNyaXを利用しています`;
+                        })(user))}
+                        </span>
                         </div>
                         </a>
                         </div>`;
