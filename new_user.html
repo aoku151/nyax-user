@@ -190,15 +190,6 @@
                         error_span.textContent = error;
                         return;
                     }
-                    const d = new Date(data.time);
-                    alert(JSON.stringify(d));
-                    const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
-                    const year = jst.getFullYear();
-                    const month = jst.getMonth();
-                    const day = jst.getDate();
-                    const hours = jst.getHours();
-                    const min = jst.getMinutes();
-                    const dates = `${year}年${month}月${day}日${hours}時${min}分よりNyaXを利用しています`;
                     recHTML += data.map(user => {
                         return `
                         <div class="widget-item recommend-user">
@@ -211,7 +202,7 @@
                         <span class="profile-joined-text">
                         ${escapeHTML(((_user)=>{
                             const d = new Date(_user.time);
-                            alert(JSON.stringify(d));
+                            //alert(JSON.stringify(d));
                             const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
                             const year = jst.getFullYear();
                             const month = jst.getMonth();
@@ -219,6 +210,7 @@
                             const hours = jst.getHours();
                             const min = jst.getMinutes();
                             const dates = `${year}年${month}月${day}日${hours}時${min}分よりNyaXを利用しています`;
+                            return dates;
                         })(user))}
                         </span>
                         </div>
