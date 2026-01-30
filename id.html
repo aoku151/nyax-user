@@ -130,7 +130,7 @@
         <input type="text" id="limit">
         <button type="button" id="submit">取得</button>
         <br>
-        <div id="user_list"></div>
+        <span id="user_list"></span>
         <span id="error"></span>
         <script>
             window.addEventListener('DOMContentLoaded', async () => {
@@ -140,6 +140,7 @@
                 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 const limit_input = document.querySelector('input#limit');
                 const submit_button = document.querySelector('button#submit');
+                const user_span = document.querySelector('span#user-list');
                 const error_span = document.querySelector('span#error');
                 
                 function escapeHTML(str) {
@@ -156,7 +157,7 @@
                     error_span.textContent = '';
                     const userId = Number(limit_input.value);
                     const { data: user, error } = await supabase.from('user').select('*').eq('id', userId).single();
-                    alert(JSON.stringify(user));
+                    user_span.textContent = JSON.stringify(user);
                     error_span.textContent = error;
                 });
             });
