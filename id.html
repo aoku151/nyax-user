@@ -177,7 +177,7 @@
                     const userid = Number(limit_input.value);
                     if(isNaN(limit_num) || limit_num == 0) return;
                     const { data: user, error } = await supabase.from('user').select('*').eq('id', userId).single();
-                    alert(JSON.stringify(data));
+                    alert(JSON.stringify(user));
                 });
             });
         </script>
