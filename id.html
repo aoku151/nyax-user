@@ -158,6 +158,7 @@
                     if(isNaN(limit_num) || limit_num == 0) return;
                     const { data: user, error } = await supabase.from('user').select('*').eq('id', userId).single();
                     alert(JSON.stringify(user));
+                    error_span.textContent = error;
                 });
             });
         </script>
