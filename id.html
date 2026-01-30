@@ -154,8 +154,7 @@
                 const calender_icon = `<svg class="calendar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
                 submit_button.addEventListener('click', async () => {
                     error_span.textContent = '';
-                    const userid = Number(limit_input.value);
-                    if(isNaN(limit_num) || limit_num == 0) return;
+                    const userId = Number(limit_input.value);
                     const { data: user, error } = await supabase.from('user').select('*').eq('id', userId).single();
                     alert(JSON.stringify(user));
                     error_span.textContent = error;
