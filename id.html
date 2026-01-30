@@ -157,6 +157,7 @@
                     error_span.textContent = '';
                     const userId = Number(limit_input.value);
                     const { data: user, error } = await supabase.from('user').select('*').eq('id', userId).single();
+                    alert(JSON.stringify(user))
                     user_span.textContent = JSON.stringify(user);
                     error_span.textContent = error;
                 });
